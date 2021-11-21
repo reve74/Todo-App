@@ -4,13 +4,24 @@ import 'package:what_todo/models/task.dart';
 import 'package:what_todo/widget.dart';
 
 class Taskpage extends StatefulWidget {
-  const Taskpage({Key? key}) : super(key: key);
+
+  final int? id;
+
+  Taskpage({@required this.id});
 
   @override
   _TaskpageState createState() => _TaskpageState();
 }
 
 class _TaskpageState extends State<Taskpage> {
+
+  @override
+  void initState() {
+
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,11 +55,16 @@ class _TaskpageState extends State<Taskpage> {
                         Expanded(
                           child: TextField(
                             onSubmitted: (value) async{
-                              print("Field Value: $value");
-
                               if(value != "") {
                                 DatabaseHelper _dbHelper = DatabaseHelper();
 
+                                Task _newTask = Task(
+                                  title: value
+                                );
+
+                                await _dbHelper.insertTask(_newTask);
+
+                                print("new task has been created");
 
                               }
                             },

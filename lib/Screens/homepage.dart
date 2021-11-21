@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:what_todo/Screens/taskpage.dart';
+import 'package:what_todo/database_helper.dart';
 import 'package:what_todo/widget.dart';
 
 class Homepage extends StatefulWidget {
@@ -10,6 +11,8 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  DatabaseHelper _dbHelper = DatabaseHelper();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,21 +38,32 @@ class _HomepageState extends State<Homepage> {
                     ),
                   ),
                   Expanded(
-                    child: ScrollConfiguration(
-                      behavior: NoGlowBehavior(),
-                      child: ListView(
-                        children: [
-                          TaskCardWidget(
-                            title: "Get Started",
-                            desc:
-                                "Hello hello hello helloh ello hellohe llohel lohello hello hello hellohel lohello",
+                    child: FutureBuilder(
+                      initialData: [],
+                      future: _dbHelper.getTasks(),
+                      builder: (context, AsyncSnapshot snapshot) {
+                        return ScrollConfiguration(
+                          behavior: NoGlowBehavior(),
+                          child: ListView.builder(
+                            itemCount: snapshot.data.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Taskpage(id: snapshot.data[index].id,),
+                                    ),
+                                  );
+                                },
+                                child: TaskCardWidget(
+                                  title: snapshot.data[index].title,
+                                ),
+                              );
+                            },
                           ),
-                          TaskCardWidget(),
-                          TaskCardWidget(),
-                          TaskCardWidget(),
-                          TaskCardWidget(),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -61,10 +75,10 @@ class _HomepageState extends State<Homepage> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => Taskpage(),
-                      ),
-                    );
+                      MaterialPageRoute(builder: (context) => Taskpage(id: 0,),),
+                    ).then((value) {
+                      setState(() {});
+                    });
                   },
                   child: Container(
                     width: 60.0,
